@@ -6,6 +6,9 @@ import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/utils/useStore";
 import * as utils from "@/utils/utils";
 
+import vertexShader from "@/shaders/vertex.glsl";
+import fragmentShader from "@/shaders/fragment.glsl";
+
 const Home = () => {
   const store = useStore();
 
@@ -53,8 +56,8 @@ const Home = () => {
 
   useEffect(() => {
     const material = new THREE.ShaderMaterial({
-      vertexShader: VERTEXT_SHADER,
-      fragmentShader: FRAGMENT_SHADER,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
       uniforms: {
         point: { value: new THREE.Vector3() },
         isOver: { value: false },
@@ -118,30 +121,3 @@ const Effect = (props: EffectProps) => {
 };
 
 export default Home;
-
-const VERTEXT_SHADER = `
-  precision mediump float;
-
-  out vec4 worldPosition;
-
-  void main() {
-    worldPosition = modelMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const FRAGMENT_SHADER = `
-  precision mediump float;
-
-  in vec4 worldPosition;
-  uniform vec3 point;
-  uniform bool isOver;
-
-  void main() {
-    if (isOver && abs(worldPosition.z - point.z) < 0.01) {
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // red
-    } else {
-      gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0); // blue
-    }
-  }
-`;
