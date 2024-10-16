@@ -9,9 +9,13 @@ import * as utils from "@/utils/utils";
 import vertexShader from "@/shaders/vertex.glsl";
 import fragmentShader from "@/shaders/fragment.glsl";
 
+import style from "@/styles/Home.module.css";
+
 const Home = () => {
   const store = useStore();
 
+  const [vertex, setVertex] = useState(vertexShader);
+  const [fragment, setFragment] = useState(fragmentShader);
   const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
   const [material, setMaterial] = useState<THREE.ShaderMaterial | null>(null);
   const mesh = useMemo(() => {
@@ -56,15 +60,19 @@ const Home = () => {
 
   useEffect(() => {
     const material = new THREE.ShaderMaterial({
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+      vertexShader: vertex,
+      fragmentShader: fragment,
       uniforms: {
         point: { value: new THREE.Vector3() },
         isOver: { value: false },
       },
     });
     setMaterial(material);
-  }, []);
+
+    return () => {
+      material.dispose();
+    };
+  }, [vertex, fragment]);
 
   useEffect(() => {
     if (!material) return;
@@ -73,7 +81,7 @@ const Home = () => {
   }, [material, point, isOver]);
 
   return (
-    <>
+    <div className={style.root}>
       <Canvas
         gl={{
           antialias: true,
@@ -93,7 +101,18 @@ const Home = () => {
           </>
         )}
       </Canvas>
-    </>
+
+      <div className={style.fields}>
+        <div className={style.field}>
+          <div className={style.label}>Vertex Shader</div>
+          <textarea value={vertex} onChange={(e) => setVertex(e.target.value)} />
+        </div>
+        <div className={style.field}>
+          <div className={style.label}>Fragment Shader</div>
+          <textarea value={fragment} onChange={(e) => setFragment(e.target.value)} />
+        </div>
+      </div>
+    </div>
   );
 };
 
