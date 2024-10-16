@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -12,6 +12,7 @@ import fragmentShader from "@/shaders/fragment.glsl";
 import style from "@/styles/Home.module.css";
 
 const Home = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const store = useStore();
 
   const [vertex, setVertex] = useState(vertexShader);
@@ -27,11 +28,12 @@ const Home = () => {
   const [isOver, setIsOver] = useState(false);
 
   const handlePointerMove = (event: React.PointerEvent) => {
-    if (!mesh) return;
+    const $canvas = canvasRef.current;
+    if (!$canvas || !mesh) return;
 
     const mouse = new THREE.Vector2();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    mouse.x = (event.clientX / $canvas.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / $canvas.clientHeight) * 2 + 1;
 
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, store.camera);
@@ -83,6 +85,7 @@ const Home = () => {
   return (
     <div className={style.root}>
       <Canvas
+        ref={canvasRef}
         gl={{
           antialias: true,
         }}
