@@ -13,6 +13,11 @@ import style from "@/styles/Home.module.css";
 
 const VERTEX_SHADER_KEY = "glsl-test__vertex-shader";
 const FRAGMENT_SHADER_KEY = "glsl-test__fragment-shader";
+const ROTATION = new THREE.Euler(
+  THREE.MathUtils.degToRad(90),
+  THREE.MathUtils.degToRad(0),
+  THREE.MathUtils.degToRad(0)
+);
 
 const Home = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,7 +87,7 @@ const Home = () => {
 
   useEffect(() => {
     const geometry = new THREE.BufferGeometry();
-    const sphereGeometry = new THREE.SphereGeometry(5, 256, 256);
+    const sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
 
     geometry.setAttribute("position", sphereGeometry.attributes.position);
     geometry.setIndex(sphereGeometry.index);
@@ -131,7 +136,7 @@ const Home = () => {
           <>
             <Effect mesh={mesh} />
             <OrbitControls enableDamping={false} />
-            <primitive object={mesh} position={[0, 0, 0]} />
+            <primitive object={mesh} position={[0, 0, 0]} rotation={ROTATION} />
           </>
         )}
       </Canvas>
