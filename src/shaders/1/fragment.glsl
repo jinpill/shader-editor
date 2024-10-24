@@ -29,8 +29,8 @@ void phongLightCalc(in vec3 reflectedNormal) {
   specularReflection = directLightColor * pow(maxCosPi, shininess) * vec3(0.2);
 }
 
-vec3 phongColorCalc() {
-  vec3 diffuseColor = vec3(0.8, 0.8, 0.8);
+vec3 phongColorCalc(float r, float g, float b) {
+  vec3 diffuseColor = vec3(r, g, b);
   vec3 diffuseReflection;
 
   // Calculate diffuse reflection
@@ -52,12 +52,15 @@ vec3 normalCalc() {
 }
 
 void main() {
+  vec3 color;
+  vec3 reflectedNormal = normalCalc();
+  phongLightCalc(reflectedNormal);
+
   if (isOver && abs(worldPosition.z - point.z) < 0.01) {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    color = phongColorCalc(1.0, 0.0, 0.0);
   } else {
-    vec3 reflectedNormal = normalCalc();
-    phongLightCalc(reflectedNormal);
-    vec3 color = phongColorCalc();
-    gl_FragColor = vec4(color, 1.0);
+    color = phongColorCalc(1.0, 1.0, 1.0);
   }
+
+  gl_FragColor = vec4(color, 1.0);
 }
