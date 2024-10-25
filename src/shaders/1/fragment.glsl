@@ -10,6 +10,8 @@ vec3 ambientReflection;
 vec3 diffuseFactor;
 vec3 specularReflection;
 
+float LINE_HALF_WIDTH = 0.02;
+
 void phongLightCalc(in vec3 reflectedNormal) {
   // Get the normal data
   vec3 faceNormal = reflectedNormal.xyz;
@@ -56,7 +58,7 @@ void main() {
   vec3 reflectedNormal = normalCalc();
   phongLightCalc(reflectedNormal);
 
-  if (isOver && abs(worldPosition.z - point.z) < 0.01) {
+  if (isOver && abs(worldPosition.z - point.z) < LINE_HALF_WIDTH) {
     color = phongColorCalc(1.0, 0.0, 0.0);
   } else {
     color = phongColorCalc(1.0, 1.0, 1.0);
