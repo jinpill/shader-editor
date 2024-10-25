@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { STLLoader } from "three/examples/jsm/Addons.js";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
@@ -14,7 +15,7 @@ import style from "@/styles/Home.module.css";
 const VERTEX_SHADER_KEY = "glsl-test__vertex-shader";
 const FRAGMENT_SHADER_KEY = "glsl-test__fragment-shader";
 const ROTATION = new THREE.Euler(
-  THREE.MathUtils.degToRad(90),
+  THREE.MathUtils.degToRad(0),
   THREE.MathUtils.degToRad(0),
   THREE.MathUtils.degToRad(0)
 );
@@ -23,16 +24,12 @@ const Home = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const vertexRef = useRef<HTMLTextAreaElement>(null);
   const fragmentRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const store = useStore();
   const [vertex, setVertex] = useState("");
   const [fragment, setFragment] = useState("");
-  const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
-  const [material, setMaterial] = useState<THREE.ShaderMaterial | null>(null);
-  const mesh = useMemo(() => {
-    if (!geometry || !material) return null;
-    return new THREE.Mesh(geometry, material);
-  }, [geometry, material]);
+  const mesh = useMemo(() => new THREE.Mesh(), []);
 
   const [point, setPoint] = useState(new THREE.Vector3());
   const [isOver, setIsOver] = useState(false);
@@ -93,8 +90,8 @@ const Home = () => {
     geometry.setIndex(sphereGeometry.index);
 
     sphereGeometry.dispose();
-    setGeometry(geometry);
-  }, []);
+    mesh.geometry = geometry;
+  }, [mesh]);
 
   useEffect(() => {
     const material = new THREE.ShaderMaterial({
@@ -105,18 +102,20 @@ const Home = () => {
         isOver: { value: false },
       },
     });
-    setMaterial(material);
+    mesh.material = material;
 
     return () => {
       material.dispose();
     };
-  }, [vertex, fragment]);
+  }, [vertex, fragment, mesh]);
 
   useEffect(() => {
-    if (!material) return;
-    material.uniforms.point.value = point;
-    material.uniforms.isOver.value = isOver;
-  }, [material, point, isOver]);
+    if (mesh.material instanceof THREE.ShaderMaterial) {
+      mesh.material.uniforms.point.value = point;
+      mesh.material.uniforms.isOver.value = isOver;
+      // mesh.material.needsUpdate = true;
+    }
+  }, [mesh, point, isOver]);
 
   return (
     <div className={style.root}>
@@ -163,6 +162,40 @@ const Home = () => {
             onChange={(e) => {
               setIsChanged(true);
               setFragment(e.target.value);
+            }}
+          />
+        </div>
+
+        <div className={style.buttons}>
+          <button
+            onClick={() => {
+              fileInputRef.current?.click();
+            }}
+          >
+            STL 파일 불러오기
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            className={style.fileInput}
+            onChange={(event) => {
+              const $input = event.target;
+              const file = $input.files?.[0];
+              if (!file) return;
+
+              const loader = new STLLoader();
+              loader.load(URL.createObjectURL(file), (geometry) => {
+                mesh.geometry.dispose();
+                mesh.geometry = geometry;
+
+                const box = new THREE.Box3();
+                box.setFromObject(mesh, true);
+                box.getCenter(mesh.position);
+                mesh.position.multiplyScalar(-1);
+              });
+
+              $input.value = "";
             }}
           />
         </div>
