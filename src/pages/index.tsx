@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three/examples/jsm/Addons.js";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
 import { useStore } from "@/utils/useStore";
@@ -97,6 +97,9 @@ const Home = () => {
     const material = new THREE.ShaderMaterial({
       vertexShader: vertex,
       fragmentShader: fragment,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
       uniforms: {
         point: { value: new THREE.Vector3() },
         isOver: { value: false },
@@ -131,13 +134,9 @@ const Home = () => {
         }}
         onPointerMove={handlePointerMove}
       >
-        {mesh && (
-          <>
-            <Effect mesh={mesh} />
-            <OrbitControls enableDamping={false} />
-            <primitive object={mesh} position={[0, 0, 0]} rotation={ROTATION} />
-          </>
-        )}
+        <Effect />
+        <OrbitControls enableDamping={false} />
+        {mesh && <primitive object={mesh} rotation={ROTATION} />}
       </Canvas>
 
       {isChanged && <div className={style.changeIcon} />}
@@ -204,13 +203,8 @@ const Home = () => {
   );
 };
 
-type EffectProps = {
-  mesh: THREE.Mesh;
-};
-
-const Effect = (props: EffectProps) => {
+const Effect = () => {
   const { setCamera } = useStore();
-
   const three = useThree();
 
   useEffect(() => {
@@ -218,11 +212,10 @@ const Effect = (props: EffectProps) => {
     setCamera(three.camera);
   }, [three.camera, setCamera]);
 
-  useFrame(() => {
-    if (true) return;
-    console.log(props);
-    // props.mesh.position.z += 0.01;
-  });
+  useEffect(() => {
+    type Background = typeof three.scene.background;
+    three.scene.background = new THREE.Color(0xffeedd) as unknown as Background;
+  }, [three]);
 
   return null;
 };
