@@ -98,8 +98,7 @@ const Home = () => {
       vertexShader: vertex,
       fragmentShader: fragment,
       transparent: true,
-      depthWrite: false,
-      blending: THREE.NormalBlending,
+      side: THREE.DoubleSide,
       uniforms: {
         point: { value: new THREE.Vector3() },
         isOver: { value: false },
@@ -116,7 +115,6 @@ const Home = () => {
     if (mesh.material instanceof THREE.ShaderMaterial) {
       mesh.material.uniforms.point.value = point;
       mesh.material.uniforms.isOver.value = isOver;
-      // mesh.material.needsUpdate = true;
     }
   }, [mesh, point, isOver]);
 
@@ -129,8 +127,9 @@ const Home = () => {
         }}
         orthographic
         camera={{
-          position: [0, -10, 0],
+          position: [0, -100, 0],
           zoom: 50,
+          near: -100,
         }}
         onPointerMove={handlePointerMove}
       >
