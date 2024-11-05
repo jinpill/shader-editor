@@ -31,8 +31,8 @@ const Home = () => {
   const [fragment, setFragment] = useState("");
   const mesh = useMemo(() => new THREE.Mesh(), []);
 
-  const [point, setPoint] = useState(new THREE.Vector3());
-  const [isOver, setIsOver] = useState(false);
+  const [castingPoint, setCastingPoint] = useState(new THREE.Vector3());
+  const [isPointerOver, setIsPointerOver] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
   const handlePointerMove = (event: React.PointerEvent) => {
@@ -48,13 +48,13 @@ const Home = () => {
 
     const intersections = raycaster.intersectObject(mesh);
     if (intersections.length === 0) {
-      setIsOver(false);
+      setIsPointerOver(false);
       return;
     }
 
     const intersection = intersections[0];
-    setPoint(intersection.point);
-    setIsOver(true);
+    setCastingPoint(intersection.point);
+    setIsPointerOver(true);
   };
 
   useEffect(() => {
@@ -100,8 +100,8 @@ const Home = () => {
       transparent: true,
       side: THREE.DoubleSide,
       uniforms: {
-        point: { value: new THREE.Vector3() },
-        isOver: { value: false },
+        castingPoint: { value: new THREE.Vector3() },
+        isPointerOver: { value: false },
       },
     });
     mesh.material = material;
@@ -113,10 +113,10 @@ const Home = () => {
 
   useEffect(() => {
     if (mesh.material instanceof THREE.ShaderMaterial) {
-      mesh.material.uniforms.point.value = point;
-      mesh.material.uniforms.isOver.value = isOver;
+      mesh.material.uniforms.castingPoint.value = castingPoint;
+      mesh.material.uniforms.isPointerOver.value = isPointerOver;
     }
-  }, [mesh, point, isOver]);
+  }, [mesh, castingPoint, isPointerOver]);
 
   return (
     <div className={style.root}>
