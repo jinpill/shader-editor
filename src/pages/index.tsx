@@ -94,14 +94,28 @@ const Home = () => {
   }, [mesh]);
 
   useEffect(() => {
+    const box = new THREE.Box3();
+    box.setFromObject(mesh, true);
+    const size = box.getSize(new THREE.Vector3());
+
     const material = new THREE.ShaderMaterial({
       vertexShader: vertex,
       fragmentShader: fragment,
       transparent: true,
       side: THREE.DoubleSide,
       uniforms: {
+        clippingHeight: { value: 0 },
+        useClipping: { value: false },
         castingPoint: { value: new THREE.Vector3() },
+        useContour: { value: true },
+        isSelected: { value: false },
         isPointerOver: { value: false },
+        isIncomplete: { value: false },
+        layerThickness: { value: 0.1 },
+        isOnBottom: { value: true },
+        opacity: { value: 1 },
+        buildSize: { value: new THREE.Vector3(100, 100, 100) },
+        bottom: { value: -size.z / 2 },
       },
     });
     mesh.material = material;
@@ -191,6 +205,11 @@ const Home = () => {
                 box.setFromObject(mesh, true);
                 box.getCenter(mesh.position);
                 mesh.position.multiplyScalar(-1);
+
+                const size = box.getSize(new THREE.Vector3());
+                if (mesh.material instanceof THREE.ShaderMaterial) {
+                  mesh.material.uniforms.bottom.value = -size.z / 2;
+                }
               });
 
               $input.value = "";
