@@ -101,24 +101,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const loader = new STLLoader();
-    loader.load("/model.stl", (geometry) => {
-      mesh.geometry.dispose();
-      mesh.geometry = geometry;
-
-      const box = new THREE.Box3();
-      box.setFromObject(mesh, true);
-      box.getCenter(mesh.position);
-      mesh.position.multiplyScalar(-1);
-
-      const size = box.getSize(new THREE.Vector3());
-      if (mesh.material instanceof THREE.ShaderMaterial) {
-        mesh.material.uniforms.bottom.value = -size.z / 2;
-      }
-    });
-  }, [mesh]);
-
-  useEffect(() => {
     const box = new THREE.Box3();
     box.setFromObject(mesh, true);
     const size = box.getSize(new THREE.Vector3());
@@ -201,6 +183,42 @@ const Home = () => {
     outsideColor,
   ]);
 
+  useEffect(() => {
+    const handleDragOver = (event: DragEvent) => {
+      event.preventDefault();
+    };
+
+    const handleDrop = (event: DragEvent) => {
+      event.preventDefault();
+      const file = event.dataTransfer?.files?.[0];
+      if (!file) return;
+
+      const url = URL.createObjectURL(file);
+      const loader = new STLLoader();
+      loader.load(url, (geometry) => {
+        mesh.geometry.dispose();
+        mesh.geometry = geometry;
+
+        const box = new THREE.Box3();
+        box.setFromObject(mesh, true);
+        box.getCenter(mesh.position);
+        mesh.position.multiplyScalar(-1);
+
+        const size = box.getSize(new THREE.Vector3());
+        if (mesh.material instanceof THREE.ShaderMaterial) {
+          mesh.material.uniforms.bottom.value = -size.z / 2;
+        }
+      });
+    };
+
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("drop", handleDrop);
+    return () => {
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, [mesh]);
+
   return (
     <div className={style.root}>
       <Canvas
@@ -211,7 +229,7 @@ const Home = () => {
         orthographic
         camera={{
           position: [0, -100, 0],
-          zoom: 50,
+          zoom: 15,
           near: -100,
           up: [0, 0, 1],
         }}
