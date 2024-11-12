@@ -11,49 +11,24 @@ uniform float opacity;
 uniform vec3 buildSize;
 uniform float bottom;
 
-vec3 color(float r, float g, float b) {
-  return vec3(r, g, b) / vec3(255.0);
-}
+uniform bool useClipping;
+uniform bool useContour;
+uniform bool isSelected;
+uniform bool isIncomplete;
+uniform bool isOnBottom;
 
-bool useClipping = false;
-bool useContour = true;
-bool isSelected = false;
-bool isIncomplete = false;
-bool isOnBottom = true;
-
-vec3 modelColor = vec3(0.8, 0.8, 0.8);
-vec3 incompleteModelColor = vec3(0.97, 0.62, 0.23);
-vec3 selectedModelColor = vec3(0.0, 0.75, 1.0);
-vec3 incompleteSelectedModelColor = vec3(1.0, 0.26, 0.08);
-vec3 bottomColor = vec3(0.0, 1.0, 0.5);
-vec3 contourColor = vec3(1.0, 0.2, 0.2);
-vec3 incompleteModelContourColor = vec3(1.0, 1.0, 1.0);
-vec3 outsideColor = vec3(1.0, 0.2, 0.2);
+uniform vec3 modelColor;
+uniform vec3 incompleteModelColor;
+uniform vec3 selectedModelColor;
+uniform vec3 incompleteSelectedModelColor;
+uniform vec3 bottomColor;
+uniform vec3 contourColor;
+uniform vec3 incompleteModelContourColor;
+uniform vec3 outsideColor;
 
 vec3 ambientReflection;
 vec3 diffuseFactor;
 vec3 specularReflection;
-
-// HERE //////////////////////////////////////////////////////////////////////////////
-void initVariables() {
-  // Flags to change conditions of the model.
-  useClipping = false;
-  useContour = true;
-  isSelected = false;
-  isIncomplete = false;
-  isOnBottom = true;
-
-  // Colors.
-  modelColor = color(204.0, 204.0, 204.0);
-  incompleteModelColor = color(247.0, 158.0, 59.0);
-  selectedModelColor = color(0.0, 191.0, 255.0);
-  incompleteSelectedModelColor = color(255.0, 66.0, 20.0);
-  bottomColor = color(0.0, 255.0, 128.0);
-  contourColor = color(255.0, 51.0, 51.0);
-  incompleteModelContourColor = color(255.0, 255.0, 255.0);
-  outsideColor = color(255.0, 51.0, 51.0);
-}
-// HERE //////////////////////////////////////////////////////////////////////////////
 
 void phongLightCalc(in vec3 reflectedNormal) {
   // Get the normal data
@@ -129,7 +104,6 @@ void main() {
     discard;
   }
 
-  initVariables();
   vec3 color = vec3(1.0, 1.0, 1.0);
   vec3 reflectedNormal = normalCalc();
   phongLightCalc(reflectedNormal);
