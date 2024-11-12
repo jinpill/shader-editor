@@ -242,7 +242,7 @@ const Home = () => {
 
       <div className={style.fields}>
         <div className={style.group}>
-          <Checkbox label="Use contour" checked={useClipping} onChange={setUseClipping} />
+          <Checkbox label="Use clipping" checked={useClipping} onChange={setUseClipping} />
           <Checkbox label="Use contour" checked={useContour} onChange={setUseContour} />
           <Checkbox label="Selected" checked={isSelected} onChange={setIsSelected} />
           <Checkbox label="Incomplete" checked={isIncomplete} onChange={setIsIncomplete} />
